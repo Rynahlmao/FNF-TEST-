@@ -2,37 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FNF Custom Chart Player</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA HTML Player</title>
+    <script src="https://unpkg.com/@mgba-emu/mgba"></script>
 </head>
 <body>
-    <h1>FNF Custom Chart Player</h1>
+    <h1>GBA Emulator</h1>
+    <input type="file" id="romInput" accept=".gba">
+    <canvas id="screen"></canvas>
     
-    <!-- File Upload Inputs -->
-    <label>Chart File (JSON):</label>
-    <input type="file" id="chartFile" accept=".json"><br>
-    
-    <label>Instrumental (OGG/MP3):</label>
-    <input type="file" id="instFile" accept=".ogg,.mp3"><br>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const gba = new mgba.core();
+            await gba.load();
+            
+            document.getElementById('romInput').addEventListener('change', async function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        await gba.loadRom(e.target.result);
+                        gba.run();
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
 
-    <label>Voices (OGG/MP3):</label>
-    <input type="file" id="voicesFile" accept=".ogg,.mp3"><br>
-    
-    <button onclick="startGame()">Load & Play</button>
-    
-    <div id="game-container"></div>
-    
-    <!-- Mobile Controls -->
-    <div id="touch-controls">
-        <button class="touch-btn" data-lane="0">←</button>
-        <button class="touch-btn" data-lane="1">↓</button>
-        <button class="touch-btn" data-lane="2">↑</button>
-        <button class="touch-btn" data-lane="3">→</button>
-    </div>
-
-    <script src="game.js"></script>
+            gba.setCanvas(document.getElementById('screen'));
+        });
+    </script>
 </body>
 </html>
